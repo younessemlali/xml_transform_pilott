@@ -102,13 +102,35 @@ def main():
     
     st.title("🔄 Convertisseur XML Pilott → ERP")
     st.markdown("""
-    Cet outil convertit les fichiers XML exportés depuis Pilott vers le format attendu par l'ERP.
+    ### 📋 Qu'est-ce que cet outil fait ?
     
-    **Transformations appliquées:**
-    - Conversion de l'encodage UTF-8 vers ISO-8859-1
-    - Suppression des blocs UserDefinedPacket
-    - Ajout du bloc PacketInfo si absent
-    - Préservation du contenu métier
+    Lorsque vous téléchargez un contrat depuis la plateforme Pilott, le fichier XML est modifié par rapport 
+    à la version originale de votre ERP. Cet outil restaure automatiquement le format exact attendu par l'ERP.
+    
+    ### 🔧 Transformations qui seront appliquées :
+    
+    1. **🔤 Conversion de l'encodage**
+       - Fichier Pilott : UTF-8
+       - → Fichier ERP : ISO-8859-1
+    
+    2. **🗑️ Suppression des métadonnées Pilott**
+       - Supprime tous les blocs `<UserDefinedPacket>` ajoutés par HR-Explorer
+       - Ces blocs contiennent des informations techniques non nécessaires à l'ERP
+    
+    3. **➕ Restauration de la structure ERP**
+       - Ajoute le bloc standard requis :
+       ```xml
+       <PacketInfo packetType="data">
+         <packetId>AssignmentPacket</packetId>
+         <action>update</action>
+       </PacketInfo>
+       ```
+    
+    4. **✅ Préservation garantie**
+       - Tout le contenu métier (Assignment, Rates, etc.) reste strictement identique
+       - L'ordre des balises et l'indentation sont respectés
+    
+    ---
     """)
     
     # Zone d'upload
@@ -140,6 +162,15 @@ def main():
             # Checkbox pour l'aperçu
             if st.checkbox("👁️ Afficher l'aperçu du fichier converti"):
                 st.code(transformed_xml.decode('iso-8859-1'), language='xml')
+            
+            # Informations sur ce qui a été fait
+            st.info("""
+            ✅ **Transformations effectuées :**
+            - Encodage converti en ISO-8859-1
+            - Blocs UserDefinedPacket supprimés
+            - Bloc PacketInfo vérifié/ajouté
+            - Structure ERP restaurée
+            """)
             
             # TODO: Ajouter ici des statistiques ou validations supplémentaires si nécessaire
             
